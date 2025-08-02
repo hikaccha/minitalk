@@ -3,32 +3,51 @@
 /*                                                        :::      ::::::::   */
 /*   client.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hichikaw <hichikaw@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ichikawahikaru <ichikawahikaru@student.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/01 10:00:00 by hikaru            #+#    #+#             */
-/*   Updated: 2025/04/21 15:43:01 by hichikaw         ###   ########.fr       */
+/*   Updated: 2025/08/02 13:47:04 by ichikawahik      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minitalk.h"
 
+static volatile sig_atomic_t	g_ack_received = 0;
+
+static void	ack_handler(int signum)
+{
+	(void)signum;
+	g_ack_received = 1;
+}
+
 static void	send_bit(int pid, int bit)
 {
-	if (bit == 1)
+	int	retries;
+	int	wait_count;
+
+	retries = 0;
+	while (retries < 10)
 	{
-		if (kill(pid, SIGUSR1) == -1)
+		g_ack_received = 0;
+		if (bit == 1)
+			kill(pid, SIGUSR1);
+		else
+			kill(pid, SIGUSR2);
+		wait_count = 0;
+		while (!g_ack_received && wait_count < 1000)
 		{
-			ft_putstr_fd("Error sending signal\n", 2);
-			exit(1);
+			usleep(100);
+			wait_count++;
 		}
+		if (g_ack_received)
+			break;
+		retries++;
+		usleep(1000);
 	}
-	else
+	if (retries >= 10)
 	{
-		if (kill(pid, SIGUSR2) == -1)
-		{
-			ft_putstr_fd("Error sending signal\n", 2);
-			exit(1);
-		}
+		ft_putstr_fd("Communication timeout\n", 2);
+		exit(1);
 	}
 }
 
@@ -62,7 +81,8 @@ void	send_string(int pid, char *str)
 
 int	main(int argc, char **argv)
 {
-	int	server_pid;
+	int				server_pid;
+	struct sigaction	sa;
 
 	if (argc != 3)
 	{
@@ -75,6 +95,10 @@ int	main(int argc, char **argv)
 		ft_putstr_fd("Invalid PID\n", 2);
 		return (1);
 	}
+	sa.sa_handler = ack_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	sigaction(SIGUSR1, &sa, NULL);
 	send_string(server_pid, argv[2]);
 	return (0);
 }
