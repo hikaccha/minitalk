@@ -6,7 +6,7 @@
 /*   By: ichikawahikaru <ichikawahikaru@student.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/01 10:00:00 by hikaru            #+#    #+#             */
-/*   Updated: 2025/08/02 13:47:04 by ichikawahik      ###   ########.fr       */
+/*   Updated: 2025/08/02 14:13:29 by ichikawahik      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,9 @@ static void	send_bit(int pid, int bit)
 			wait_count++;
 		}
 		if (g_ack_received)
-			break;
+			break ;
 		retries++;
 		usleep(1000);
-	}
-	if (retries >= 10)
-	{
-		ft_putstr_fd("Communication timeout\n", 2);
-		exit(1);
 	}
 }
 
@@ -81,7 +76,7 @@ void	send_string(int pid, char *str)
 
 int	main(int argc, char **argv)
 {
-	int				server_pid;
+	int					server_pid;
 	struct sigaction	sa;
 
 	if (argc != 3)
