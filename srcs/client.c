@@ -6,7 +6,7 @@
 /*   By: ichikawahikaru <ichikawahikaru@student.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/01 10:00:00 by hikaru            #+#    #+#             */
-/*   Updated: 2025/08/02 15:42:35 by ichikawahik      ###   ########.fr       */
+/*   Updated: 2025/08/03 14:48:01 by ichikawahik      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ static void	send_bit(int pid, int bit)
 	}
 }
 
-void	send_char(int pid, char c)
+static void	send_char(int pid, char c)
 {
 	int	bit;
 	int	i;
@@ -61,7 +61,7 @@ void	send_char(int pid, char c)
 	}
 }
 
-void	send_string(int pid, char *str)
+static void	send_string(int pid, char *str)
 {
 	int	i;
 
